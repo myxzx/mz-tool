@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MZ TOOL</title>
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="favicon-16.png" sizes="16x16" type="image/png">
+<link rel="shortcut icon" href="favicon.ico">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500;600&family=DM+Sans:wght@400;500&display=swap">
+<!-- Auteur : mz — OSINT légal, 100 % local (aucun serveur, aucune clé API) -->
+<style>
+:root{color-scheme:dark;--bg:#0a0a0c;--card:#121215;--s2:#1a1a1f;--line:rgba(255,255,255,.08);--ink:#ececf1;--mut:#8b8b97;--acc:#a3a8ff;--accT:#0a0a0c;--ok:#6fdca4;--err:#ff7f7f;--glow:rgba(110,118,255,.16);--disp:"Unbounded","Segoe UI",system-ui,sans-serif;--rs:1}
+:root[data-theme=light]{color-scheme:light;--bg:#f4f4f7;--card:#fff;--s2:#efeff3;--line:rgba(0,0,0,.09);--ink:#17171c;--mut:#6f6f7b;--acc:#4a52e8;--accT:#fff;--ok:#1f8a58;--err:#c93a3a;--glow:rgba(110,118,255,.13)}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 "DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
+body::before{content:"";position:fixed;left:-15vw;top:-25vh;width:70vw;height:70vw;max-width:900px;max-height:900px;background:radial-gradient(closest-side,var(--glow),transparent);pointer-events:none}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+#app{position:relative;display:grid;grid-template-columns:232px minmax(0,1fr);min-height:100vh}
+.side{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;padding:26px 16px 22px}
+#brand{background:none;border:0;color:var(--ink);font:300 16px var(--disp);text-align:left;padding:4px 12px 28px;cursor:pointer}
+#brand b{font-weight:600}
+nav{display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+nav button{display:flex;align-items:center;gap:10px;background:none;border:0;border-radius:calc(10px*var(--rs));padding:8px 12px;font:inherit;color:var(--mut);cursor:pointer;text-align:left;white-space:nowrap;transition:background .2s,color .2s}
+nav button::before{content:"";width:5px;height:5px;border-radius:50%;background:transparent;transition:background .2s}
+nav button:hover,nav button[aria-selected=true]{color:var(--ink);background:var(--s2)}
+nav button[aria-selected=true]::before{background:var(--acc)}
+.spacer{flex:1}
+.me{padding:14px 12px 0;border-top:1px solid var(--line);display:grid;gap:10px}
+#who{display:flex;align-items:center;gap:10px;min-width:0;font-weight:500}
+#who span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+main{padding:64px clamp(20px,5vw,72px) 72px;max-width:1560px;width:100%}
+.hi{margin:0;color:var(--mut)}
+.hero h2{font:500 clamp(34px,5.4vw,56px)/1.1 "DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;margin:6px 0 0;display:flex;align-items:center;gap:18px;flex-wrap:wrap;letter-spacing:-.035em}
+.av{width:56px;height:56px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 1px var(--line),0 10px 30px rgba(0,0,0,.35)}
+.av.sm{width:30px;height:30px;box-shadow:0 0 0 1px var(--line)}
+.smart{display:flex;gap:10px;margin:36px 0 30px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.tile{display:flex;flex-direction:column;gap:4px;text-align:left;font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:calc(16px*var(--rs));padding:16px 18px;cursor:pointer;transition:transform .25s,border-color .25s,background .25s}
+.tile:hover{transform:translateY(-3px);border-color:var(--acc)}
+.tile b{font-weight:500}.tile span{color:var(--mut);font-size:13px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+input,select,textarea{font:inherit;padding:12px 14px;border:1px solid var(--line);border-radius:calc(12px*var(--rs));background:var(--card);color:var(--ink);min-width:0;transition:border-color .2s,box-shadow .2s}
+input:focus,select:focus,textarea:focus{outline:0;border-color:var(--acc);box-shadow:0 0 0 4px var(--glow)}
+input.big{flex:1;min-width:220px;padding:15px 18px;font-size:16px;border-radius:calc(14px*var(--rs))}
+textarea{width:100%;font:13px/1.5 ui-monospace,Consolas,monospace;resize:vertical}
+.btn{font:inherit;font-weight:500;padding:12px 20px;border-radius:calc(12px*var(--rs));border:1px solid transparent;background:var(--ink);color:var(--bg);cursor:pointer;text-decoration:none;display:inline-block;transition:opacity .2s,background .2s,transform .15s}
+.btn:hover{opacity:.88}.btn:active{transform:scale(.98)}
+.btn.alt{background:transparent;color:var(--ink);border-color:var(--line)}.btn.alt:hover{background:var(--s2);opacity:1}
+.btn.sm{padding:6px 12px;font-size:13px}
+.btn.discord{background:#5865f2;color:#fff;padding:14px 26px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:calc(16px*var(--rs));padding:18px 20px;margin-top:14px}
+.card h3{margin:0 0 10px;font-size:15px;font-weight:500}
+dl{display:grid;grid-template-columns:max-content 1fr;gap:6px 18px;margin:0}
+dt{color:var(--mut)}dd{margin:0;word-break:break-word}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tags span,.tags a{background:var(--s2);border:1px solid var(--line);border-radius:calc(8px*var(--rs));padding:3px 10px;font-size:13px;color:var(--ink);text-decoration:none;cursor:copy}
+.tags a{cursor:pointer}.tags a:hover{border-color:var(--acc)}
+.mut{color:var(--mut)}.err{color:var(--err)}
+pre{margin:0;white-space:pre-wrap;word-break:break-all;font:13px/1.5 ui-monospace,Consolas,monospace}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+.grid a{display:block;padding:12px 14px;border:1px solid var(--line);border-radius:calc(12px*var(--rs));background:var(--card);color:var(--ink);text-decoration:none;transition:border-color .2s,transform .2s}
+.grid a:hover{border-color:var(--acc);transform:translateY(-2px)}
+.grid small{display:block;color:var(--mut)}
+.drop{text-align:center;border:1px dashed var(--line);padding:34px}.drop.hot{border-color:var(--acc)}
+details.card summary{cursor:pointer;color:var(--mut)}
+ul.hist{list-style:none;padding:0;margin:0}
+ul.hist li{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.foot{margin-top:34px;color:var(--mut);font-size:12.5px;max-width:62ch}
+#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:7px 16px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.on{opacity:1}
+#gate{position:fixed;inset:0;display:grid;place-items:center;z-index:10;padding:24px}
+.gatebox{text-align:center;max-width:400px}
+.wm{font:300 clamp(40px,9vw,56px) var(--disp);letter-spacing:-.03em;margin-bottom:10px}.wm b{font-weight:600}
+.gatebox p{margin:0 0 26px}.gatebox ol{text-align:left;color:var(--mut);padding-left:20px}.gatebox li{margin:8px 0}
+@media(max-width:860px){#app{grid-template-columns:1fr}.side{position:static;height:auto;padding:16px}#brand{padding-bottom:12px}nav{flex-direction:row;overflow-x:auto;padding-bottom:6px}.spacer{display:none}.me{margin-top:12px}main{padding-top:30px}}
+@media(prefers-reduced-motion:no-preference){@keyframes rise{from{opacity:0;transform:translateY(12px)}}#view>*,.card,.tile{animation:rise .5s cubic-bezier(.2,.7,.2,1) both}.tile{animation-delay:calc(var(--i)*35ms)}.gatebox{animation:rise .7s both}}
+
+/* ---------- Accueil sur deux colonnes ---------- */
+.homegrid{display:grid;grid-template-columns:minmax(0,1fr);gap:28px 44px;align-items:start}
+.homeside{display:grid;gap:14px;align-content:start}
+.homeside .card{margin-top:0}
+.homeside h3{color:var(--mut);font-weight:500;font-size:12.5px;letter-spacing:.04em;text-transform:uppercase}
+#recent li{justify-content:flex-start}#recent li span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.clock{font:500 42px/1 "DM Sans",system-ui,sans-serif;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.dte{margin-top:8px;color:var(--mut)}
+@media(min-width:1100px){.homegrid{grid-template-columns:minmax(0,1fr) 340px}.homeside{position:sticky;top:40px;margin-top:10px}}
+/* résultats d'outils : plusieurs colonnes quand il y a de la place */
+#res{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:14px;margin-top:14px;align-items:start}
+#res>.card{margin:0}#res>:not(.card){grid-column:1/-1}
+/* ---------- Sélecteur de thème ---------- */
+.me{position:relative}
+.tbox{position:absolute;left:0;bottom:calc(100% + 10px);width:268px;background:var(--card);border:1px solid var(--line);border-radius:calc(14px*var(--rs));padding:14px;display:grid;gap:14px;box-shadow:0 24px 60px rgba(0,0,0,.4);z-index:20;font-size:13px}
+.tbox .lbl{display:flex;justify-content:space-between;color:var(--mut);font-size:12px;margin-bottom:6px}
+.seg{display:flex;gap:3px;background:var(--s2);border-radius:calc(10px*var(--rs));padding:3px}
+.seg button{flex:1;font:inherit;font-size:12.5px;border:0;background:none;color:var(--mut);padding:6px 4px;border-radius:calc(8px*var(--rs));cursor:pointer;transition:background .2s,color .2s}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.tbox input[type=range]{width:100%;padding:0;border:0;background:none;accent-color:var(--ink);box-shadow:none}
+.tbox .chk{display:flex;align-items:center;gap:8px;color:var(--ink);cursor:pointer}
+.tbox input[type=checkbox]{padding:0;width:auto;accent-color:var(--ink)}
+.tbox .cust{display:grid;gap:14px;padding-top:14px;border-top:1px solid var(--line)}
+:root[data-theme=mono][data-photo=bw] .av{filter:grayscale(1)}
+:root[data-theme=mono] .btn.discord{background:var(--ink);color:var(--bg)}
+:root[data-theme=mono] .err{text-decoration:underline}
+@media(max-width:860px){.tbox{bottom:auto;top:calc(100% + 8px)}}
+#bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 0;margin-bottom:8px;border-bottom:1px solid var(--line);font-size:13px;color:var(--mut)}
+#bar b{color:var(--ink);font-weight:500}
+#bar .lvl{display:inline-flex;align-items:center;gap:8px}
+#bar .lvl::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--acc)}
+.pl{font-style:normal;font-size:10px;letter-spacing:.05em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:1px 7px;color:var(--mut);margin-left:auto}
+.tile .pl{align-self:flex-start;margin:4px 0 0}
+nav button.lk2{opacity:.55}
+nav button::before{flex:none}nav .pl{font-size:9px;padding:1px 6px}
+@media(min-width:861px){nav{overflow-x:hidden}}
+.en{display:inline-flex;align-items:center;background:var(--s2);border:1px solid var(--line);border-radius:999px;padding:2px 4px 2px 10px;margin:3px 4px 3px 0;font-size:13px}
+.en .ev{cursor:pointer;word-break:break-all}.en button{background:none;border:0;color:var(--mut);cursor:pointer;padding:2px 6px;font:inherit;border-radius:999px}.en button:hover{color:var(--ink);background:var(--card)}
+.ens{display:flex;flex-wrap:wrap;align-items:center;margin-top:6px}.grp{padding:10px 0;border-top:1px solid var(--line)}.grp:first-child{border-top:0}
+.drow{display:grid;grid-template-columns:100px minmax(0,1.2fr) minmax(0,1fr) auto;gap:10px;align-items:center;padding:6px 0;border-top:1px solid var(--line)}
+.in{background:var(--s2);border:1px solid var(--line);color:var(--ink);border-radius:10px;font:inherit;padding:7px 11px;width:100%}
+@media(max-width:860px){.drow{grid-template-columns:1fr}}
+.join{font-size:13px;color:var(--mut);margin:0 0 18px}.join a{color:var(--acc)}
+.gatebox .row2{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+</style>
+</head>
+<body>
+<div id="gate" hidden><div class="gatebox"><div class="wm"><b>MZ</b> TOOL</div><p class="mut">Recherche dans des sources publiques et légales.</p><div id="gate-body"></div></div></div>
+<div id="app" hidden>
+  <aside class="side">
+    <button id="brand" aria-label="Accueil"><b>MZ</b> TOOL</button>
+    <nav role="tablist" id="tabs"></nav>
+    <div class="spacer"></div>
+    <div class="me"><div id="who"></div><div class="row"><button class="btn alt sm" id="th" aria-label="Changer de thème">Thème</button><button class="btn alt sm" id="lo">Déconnexion</button></div><div class="tbox" id="tbox" hidden></div></div>
+  </aside>
+  <main>
+    <div id="bar"></div>
+    <section id="view"></section>
+    <details class="card"><summary>Historique local</summary>
+      <div class="row" style="margin:12px 0"><button class="btn alt sm" id="exp">Exporter</button><button class="btn alt sm" id="clr">Vider</button></div>
+      <ul class="hist" id="hist"></ul></details>
+    <p class="foot">Utilise MZ TOOL sur des domaines, des entreprises, des infrastructures publiques ou tes propres comptes. Pas de compilation de données sur des personnes privées sans raison légitime (RGPD), pas d’intrusion, pas de données issues de fuites.</p>
+  </main>
+</div>
+<script>document.write('<script src="config.js?t='+Date.now()+'"><\/script>')</script>
+<script>
+const $=(s,r=document)=>r.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const enc=encodeURIComponent;
+const out=h=>{const d=document.createElement("div");d.innerHTML=h;return d};
+const dateFR=s=>{try{return new Date(s).toLocaleDateString("fr-FR")}catch{return s}};
+
+/* ---------- Historique (localStorage, facultatif) ---------- */
+let hist=[];
+try{hist=JSON.parse(localStorage.getItem("mz_osint_hist")||"[]")}catch{}
+function log(type,q){
+  hist.unshift({type,q,t:new Date().toISOString()});hist=hist.slice(0,50);
+  try{localStorage.setItem("mz_osint_hist",JSON.stringify(hist))}catch{}
+  drawHist();
+}
+function drawHist(){
+  $("#hist").innerHTML=hist.length?hist.map(h=>`<li class="lk" data-t="${esc(h.type)}" data-q="${esc(h.q)}"><span>${esc(h.type)} — ${esc(h.q)}</span><span class="mut">${new Date(h.t).toLocaleString("fr-FR")}</span></li>`).join(""):'<li class="mut">Aucune recherche pour l’instant.</li>';
+}
+$("#clr").onclick=()=>{hist=[];try{localStorage.removeItem("mz_osint_hist")}catch{};drawHist()};
+$("#exp").onclick=()=>{
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(hist,null,2)],{type:"application/json"}));
+  a.download="mz-tool-historique.json";a.click();
+};
+
+/* ---------- Utilitaires ---------- */
+async function getJSON(url,opts){
+  const r=await fetch(url,opts);
+  if(!r.ok)throw new Error("HTTP "+r.status);
+  return r.json();
+}
+const card=(title,body)=>`<div class="card"><h3>${esc(title)}</h3>${body}</div>`;
+const dl=rows=>"<dl>"+rows.filter(r=>r[1]).map(r=>`<dt>${esc(r[0])}</dt><dd>${r[1]}</dd>`).join("")+"</dl>";
+const tags=a=>a.length?`<div class="tags">${a.map(x=>`<span>${esc(x)}</span>`).join("")}</div>`:'<span class="mut">Aucun résultat.</span>';
+function cleanDomain(v){return v.trim().toLowerCase().replace(/^https?:\/\//,"").replace(/^www\./,"").split(/[\/?#]/)[0]}
+function searchRow(ph,onGo,extra=""){
+  return `<div class="row"><input class="big" id="q" placeholder="${ph}" autocomplete="off" spellcheck="false"><button class="btn" id="go">Rechercher</button>${extra}</div><div id="res"></div>`;
+}
+function bind(onGo){
+  const go=()=>{const v=$("#q").value.trim();if(v)onGo(v)};
+  $("#go").onclick=go;$("#q").addEventListener("keydown",e=>{if(e.key==="Enter")go()});$("#q").focus();
+}
+
+/* ---------- Onglet : Domaine ---------- */
+async function domaine(raw){
+  const d=cleanDomain(raw),res=$("#res");
+  res.innerHTML='<p class="mut">Interrogation de RDAP, DNS, certificats et archives…</p>';
+  log("Domaine",d);
+  const parts=[];
+  const dns=async t=>{
+    const j=await getJSON(`https://cloudflare-dns.com/dns-query?name=${enc(d)}&type=${t}`,{headers:{accept:"application/dns-json"}});
+    return (j.Answer||[]).map(a=>a.data);
+  };
+  const jobs=await Promise.allSettled([
+    getJSON("https://rdap.org/domain/"+enc(d)),
+    dns("A"),dns("AAAA"),dns("MX"),dns("NS"),dns("TXT"),
+    getJSON(`https://crt.sh/?q=%25.${enc(d)}&output=json`),
+    getJSON("https://archive.org/wayback/available?url="+enc(d))
+  ]);
+  const [rdap,a,aaaa,mx,ns,txt,crt,wb]=jobs;
+  if(rdap.status==="fulfilled"){
+    const r=rdap.value,ev=n=>{const e=(r.events||[]).find(x=>x.eventAction===n);return e?dateFR(e.eventDate):""};
+    const reg=(r.entities||[]).find(e=>(e.roles||[]).includes("registrar"));
+    const rn=reg&&reg.vcardArray?((reg.vcardArray[1].find(x=>x[0]==="fn")||[])[3]):"";
+    parts.push(card("Enregistrement (RDAP)",dl([
+      ["Domaine",esc(r.ldhName||d)],["Registrar",esc(rn)],["Créé le",ev("registration")],
+      ["Expire le",ev("expiration")],["Dernière modif.",ev("last changed")],
+      ["Statuts",esc((r.status||[]).join(", "))]
+    ])));
+  }else parts.push(card("Enregistrement (RDAP)",'<span class="mut">Indisponible pour ce domaine (certaines extensions n’ont pas de RDAP public).</span>'));
+  const v=x=>x.status==="fulfilled"?x.value:[];
+  parts.push(card("DNS (via Cloudflare DoH)",dl([
+    ["A",tags(v(a))],["AAAA",tags(v(aaaa))],["MX",tags(v(mx))],["NS",tags(v(ns))],
+    ["TXT",v(txt).map(t=>`<div><pre>${esc(t)}</pre></div>`).join("")]
+  ])));
+  if(crt.status==="fulfilled"){
+    const set=new Set();
+    crt.value.forEach(c=>String(c.name_value).split("\n").forEach(n=>set.add(n.replace(/^\*\./,""))));
+    const list=[...set].sort();
+    parts.push(card(`Sous-domaines vus dans les certificats publics (${list.length})`,tags(list.slice(0,150))+(list.length>150?`<p class="mut">… et ${list.length-150} autres.</p>`:"")));
+  }else parts.push(card("Certificats publics (crt.sh)",'<span class="mut">Service lent ou indisponible, réessaie dans un instant.</span>'));
+  if(wb.status==="fulfilled"){
+    const s=wb.value.archived_snapshots&&wb.value.archived_snapshots.closest;
+    parts.push(card("Archives web",s?`<a href="${esc(s.url)}" target="_blank" rel="noopener">Dernière capture : ${esc(s.timestamp.slice(6,8)+"/"+s.timestamp.slice(4,6)+"/"+s.timestamp.slice(0,4))}</a> · <a href="https://web.archive.org/web/*/${esc(d)}" target="_blank" rel="noopener">Toutes les captures</a>`:'<span class="mut">Aucune capture trouvée.</span>'));
+  }
+  res.innerHTML=parts.join("");
+}
+
+/* ---------- Onglet : IP ---------- */
+async function ip(v){
+  const res=$("#res");res.innerHTML='<p class="mut">Recherche…</p>';log("IP",v);
+  try{
+    const j=await getJSON("https://ipwho.is/"+enc(v));
+    if(j.success===false)throw new Error(j.message||"IP invalide");
+    res.innerHTML=card("Géolocalisation approximative",dl([
+      ["IP",esc(j.ip)],["Type",esc(j.type)],["Pays",esc(j.country)+" "+esc(j.flag&&j.flag.emoji||"")],
+      ["Région / ville",esc([j.region,j.city].filter(Boolean).join(" / "))],
+      ["Opérateur (ASN)",esc(j.connection&&("AS"+j.connection.asn+" — "+j.connection.isp))],
+      ["Organisation",esc(j.connection&&j.connection.org)],["Fuseau",esc(j.timezone&&j.timezone.id)]
+    ])+'<p class="mut" style="margin:10px 0 0">La position correspond en général à l’opérateur, pas à une adresse précise.</p>');
+    try{
+      const r=await getJSON("https://rdap.org/ip/"+enc(v));
+      res.innerHTML+=card("Bloc réseau (RDAP)",dl([["Nom",esc(r.name)],["Plage",esc(r.startAddress+" → "+r.endAddress)],["Pays",esc(r.country)],["Type",esc(r.type)]]));
+    }catch{}
+  }catch(e){res.innerHTML=`<p class="err">${esc(e.message)}</p>`}
+}
+
+/* ---------- Onglet : Entreprise (FR) ---------- */
+async function entreprise(v){
+  const res=$("#res");res.innerHTML='<p class="mut">Recherche dans l’annuaire officiel…</p>';log("Entreprise",v);
+  try{
+    const j=await getJSON(`https://recherche-entreprises.api.gouv.fr/search?q=${enc(v)}&per_page=10`);
+    if(!j.results.length){res.innerHTML='<p class="mut">Aucune entreprise trouvée.</p>';return}
+    res.innerHTML=j.results.map(e=>{
+      const s=e.siege||{};
+      return card(e.nom_complet||"Sans nom",dl([
+        ["SIREN",esc(e.siren)],["Adresse du siège",esc(s.adresse||s.geo_adresse)],
+        ["Activité (NAF)",esc(e.activite_principale)],["Créée le",e.date_creation?dateFR(e.date_creation):""],
+        ["État",esc(e.etat_administratif==="A"?"Active":"Cessée")],["Effectif",esc(e.tranche_effectif_salarie)],
+        ["Dirigeants",esc((e.dirigeants||[]).filter(x=>x.denomination||x.nom).slice(0,5).map(x=>x.denomination||((x.prenoms||"")+" "+x.nom)+" ("+(x.qualite||"")+")").join(" ; "))],
+        ["Fiche",`<a href="https://annuaire-entreprises.data.gouv.fr/entreprise/${esc(e.siren)}" target="_blank" rel="noopener">Annuaire des entreprises</a>`]
+      ]));
+    }).join("");
+  }catch(e){res.innerHTML=`<p class="err">${esc(e.message)}</p>`}
+}
+
+/* ---------- Onglet : Pseudo (liens publics) ---------- */
+const PROFILS=[
+  ["GitHub","https://github.com/{u}"],["Reddit","https://www.reddit.com/user/{u}"],
+  ["Instagram","https://www.instagram.com/{u}/"],["X","https://x.com/{u}"],
+  ["TikTok","https://www.tiktok.com/@{u}"],["YouTube","https://www.youtube.com/@{u}"],
+  ["Twitch","https://www.twitch.tv/{u}"],["Pinterest","https://www.pinterest.com/{u}/"],
+  ["Steam","https://steamcommunity.com/id/{u}"],["GitLab","https://gitlab.com/{u}"],
+  ["Medium","https://medium.com/@{u}"],["Telegram","https://t.me/{u}"]
+];
+function pseudo(v){
+  log("Pseudo",v);
+  $("#res").innerHTML=card("Profils publics à vérifier",`<p class="mut" style="margin-top:0">Chaque lien s’ouvre dans un nouvel onglet : tu vérifies toi-même, rien n’est aspiré.</p><div class="grid">${PROFILS.map(p=>`<a href="${esc(p[1].replace("{u}",enc(v)))}" target="_blank" rel="noopener">${esc(p[0])}<small>${esc(p[1].replace("{u}",v).replace("https://",""))}</small></a>`).join("")}</div>`)
+  +card("Recherche du pseudo entre guillemets",`<div class="row">${[["Google","https://www.google.com/search?q="],["Bing","https://www.bing.com/search?q="],["DuckDuckGo","https://duckduckgo.com/?q="],["Brave","https://search.brave.com/search?q="]].map(m=>`<a class="btn alt sm" target="_blank" rel="noopener" href="${m[1]+enc('"'+v+'"')}">${m[0]}</a>`).join("")}</div>`);
+}
+
+/* ---------- Onglet : Dorks ---------- */
+const MOTEURS=[["Google","https://www.google.com/search?q="],["Bing","https://www.bing.com/search?q="],["DuckDuckGo","https://duckduckgo.com/?q="],["Brave","https://search.brave.com/search?q="]];
+function dorksView(){
+  $("#view").innerHTML=`
+  <div class="row">
+    <input class="big" id="d_q" placeholder="Mots-clés ou expression exacte">
+    <input id="d_site" placeholder="site: (ex. exemple.fr)">
+    <select id="d_ft"><option value="">Tout type de fichier</option><option>pdf</option><option>docx</option><option>xlsx</option><option>pptx</option><option>txt</option></select>
+    <input id="d_title" placeholder="intitle:">
+    <input id="d_url" placeholder="inurl:">
+  </div>
+  <div class="card"><h3>Requête générée</h3><pre id="d_out" class="mut">Remplis un champ.</pre>
+    <div class="row" style="margin-top:12px" id="d_btns"></div></div>
+  <div class="card"><h3>Modèles</h3><div class="row">
+    <button class="btn alt sm" data-p='site:{s} filetype:pdf'>PDF publics d’un site</button>
+    <button class="btn alt sm" data-p='site:{s} intitle:"index of"'>Répertoires ouverts</button>
+    <button class="btn alt sm" data-p='site:{s} inurl:contact OR inurl:mentions-legales'>Mentions légales</button>
+    <button class="btn alt sm" data-p='"{s}" -site:{s}'>Mentions externes</button></div>
+    <p class="mut" style="margin-bottom:0">Les modèles utilisent le champ site: ci-dessus.</p></div>`;
+  const build=()=>{
+    const q=$("#d_q").value.trim(),s=$("#d_site").value.trim(),f=$("#d_ft").value,t=$("#d_title").value.trim(),u=$("#d_url").value.trim();
+    const p=[];
+    if(q)p.push(/\s/.test(q)&&!/^".*"$/.test(q)?`"${q}"`:q);
+    if(s)p.push("site:"+s);if(f)p.push("filetype:"+f);if(t)p.push(`intitle:"${t}"`);if(u)p.push("inurl:"+u);
+    const query=p.join(" ");
+    $("#d_out").textContent=query||"Remplis un champ.";
+    $("#d_btns").innerHTML=query?MOTEURS.map(m=>`<a class="btn sm" target="_blank" rel="noopener" href="${m[1]+enc(query)}">${m[0]}</a>`).join(""):"";
+    return query;
+  };
+  ["d_q","d_site","d_ft","d_title","d_url"].forEach(i=>$("#"+i).addEventListener("input",build));
+  $("#d_btns").addEventListener("click",()=>{const q=build();if(q)log("Dork",q)});
+  document.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{
+    const s=$("#d_site").value.trim();if(!s){$("#d_site").focus();return}
+    $("#d_q").value="";$("#d_out").textContent=b.dataset.p.replaceAll("{s}",s);
+    $("#d_btns").innerHTML=MOTEURS.map(m=>`<a class="btn sm" target="_blank" rel="noopener" href="${m[1]+enc(b.dataset.p.replaceAll("{s}",s))}">${m[0]}</a>`).join("");
+  });
+}
+
+/* ---------- Onglet : Sources ---------- */
+function sourcesView(){
+  const S=[
+    ["Archive.org","Captures historiques de sites","https://web.archive.org/"],
+    ["Annuaire des entreprises","Données officielles françaises","https://annuaire-entreprises.data.gouv.fr/"],
+    ["BODACC","Annonces légales commerciales","https://www.bodacc.fr/"],
+    ["INPI / data.inpi.fr","Marques et brevets","https://data.inpi.fr/"],
+    ["data.gouv.fr","Jeux de données publics","https://www.data.gouv.fr/"],
+    ["Légifrance","Textes de loi et jurisprudence","https://www.legifrance.gouv.fr/"],
+    ["Wikidata","Base de connaissances ouverte","https://www.wikidata.org/"],
+    ["OpenStreetMap","Carte collaborative","https://www.openstreetmap.org/"],
+    ["Géoportail","Cartes et photos aériennes IGN","https://www.geoportail.gouv.fr/"],
+    ["TinEye","Recherche d’image inversée","https://tineye.com/"],
+    ["Google Lens","Recherche d’image inversée","https://lens.google.com/"],
+    ["Have I Been Pwned","Vérifier TON adresse e-mail","https://haveibeenpwned.com/"],
+    ["Shodan","Appareils exposés (compte gratuit)","https://www.shodan.io/"],
+    ["urlscan.io","Analyse publique d’une URL","https://urlscan.io/"]
+  ];
+  $("#view").innerHTML=`<div class="grid">${S.map(s=>`<a href="${s[2]}" target="_blank" rel="noopener">${s[0]}<small>${s[1]}</small></a>`).join("")}</div>`;
+}
+
+/* ---------- Navigation ---------- */
+const MAP={};
+function openTab(i,val){show(i);if(val!=null&&$("#q")){$("#q").value=val;$("#go").click()}}
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("on"),1200)}
+document.addEventListener("click",e=>{
+  const s=e.target.closest(".tags span");if(s)navigator.clipboard.writeText(s.textContent).then(()=>toast("Copié"),()=>{});
+  const a=e.target.closest("[data-ip]");if(a){e.preventDefault();openTab(1,a.dataset.ip)}
+});
+$("#hist").onclick=$("#view").onclick=e=>{const l=e.target.closest(".lk");if(l&&MAP[l.dataset.t]!=null)openTab(MAP[l.dataset.t],l.dataset.q)};
+/* ---------- Thèmes : Sombre / Clair / Noir & blanc (personnalisable) ---------- */
+const MONO_DEF={base:"dark",gray:30,round:100,photo:true};
+const MVARS=["--bg","--card","--s2","--line","--ink","--mut","--acc","--accT","--ok","--err","--glow","--rs"];
+let theme="dark",mono={...MONO_DEF};
+try{const t=localStorage.getItem("mz_osint_theme");if(["dark","light","mono"].includes(t))theme=t}catch{}
+try{Object.assign(mono,JSON.parse(localStorage.getItem("mz_osint_mono")||"{}"))}catch{}
+function saveTheme(){try{localStorage.setItem("mz_osint_theme",theme);localStorage.setItem("mz_osint_mono",JSON.stringify(mono))}catch{}}
+function applyTheme(){
+  const d=document.documentElement,dk=mono.base==="dark",g=+mono.gray,gr=v=>`hsl(0 0% ${v}%)`;
+  d.dataset.theme=theme;d.dataset.photo=mono.photo?"bw":"color";
+  MVARS.forEach(v=>d.style.removeProperty(v));d.style.removeProperty("color-scheme");
+  if(theme==="mono"){
+    const set={"--bg":dk?"#000":"#fff","--card":gr(dk?2+g*.10:99-g*.08),"--s2":gr(dk?6+g*.12:96-g*.10),
+      "--line":dk?`rgba(255,255,255,${.09+g*.0018})`:`rgba(0,0,0,${.09+g*.0018})`,
+      "--ink":dk?"#fff":"#000","--mut":dk?"#9a9a9a":"#666","--acc":dk?"#fff":"#000","--accT":dk?"#000":"#fff",
+      "--ok":dk?"#fff":"#000","--err":dk?"#c8c8c8":"#333","--glow":dk?"rgba(255,255,255,.07)":"rgba(0,0,0,.06)","--rs":mono.round/100};
+    Object.entries(set).forEach(([k,v])=>d.style.setProperty(k,v));d.style.colorScheme=dk?"dark":"light";
+  }
+  const m=document.querySelector('meta[name=theme-color]');
+  if(m)m.content=theme==="mono"?(dk?"#000":"#fff"):theme==="light"?"#f4f4f7":"#0a0a0c";
+}
+function drawTbox(){
+  const seg=(items,cur,k)=>`<div class="seg">${items.map(i=>`<button data-${k}="${i[0]}" aria-pressed="${cur===i[0]}">${i[1]}</button>`).join("")}</div>`;
+  $("#tbox").innerHTML=`<div><div class="lbl">Thème</div>${seg([["dark","Sombre"],["light","Clair"],["mono","Noir & blanc"]],theme,"th")}</div>`+
+  (theme==="mono"?`<div class="cust"><div><div class="lbl">Fond</div>${seg([["dark","Noir"],["light","Blanc"]],mono.base,"base")}</div>
+    <div><div class="lbl"><span>Gris des surfaces</span><span>${mono.gray}</span></div><input type="range" min="0" max="100" value="${mono.gray}" data-k="gray"></div>
+    <div><div class="lbl"><span>Arrondis</span><span>${mono.round}%</span></div><input type="range" min="0" max="150" step="10" value="${mono.round}" data-k="round"></div>
+    <label class="chk"><input type="checkbox" data-k="photo" ${mono.photo?"checked":""}> Photo de profil en noir & blanc</label>
+    <button class="btn alt sm" id="mreset">Réinitialiser</button></div>`:"");
+}
+$("#th").onclick=e=>{e.stopPropagation();const b=$("#tbox");b.hidden=!b.hidden;if(!b.hidden)drawTbox()};
+$("#tbox").onclick=e=>{
+  e.stopPropagation();
+  const t=e.target.closest("[data-th]"),bs=e.target.closest("[data-base]");
+  if(t){theme=t.dataset.th}else if(bs){mono.base=bs.dataset.base}else if(e.target.id==="mreset"){mono={...MONO_DEF}}else return;
+  applyTheme();saveTheme();drawTbox();
+};
+$("#tbox").oninput=e=>{
+  const k=e.target.dataset.k;if(!k)return;
+  mono[k]=e.target.type==="checkbox"?e.target.checked:+e.target.value;
+  applyTheme();saveTheme();
+  if(k!=="photo"){const l=e.target.closest("div").querySelector(".lbl span:last-child");if(l)l.textContent=mono[k]+(k==="round"?"%":"")}
+};
+document.addEventListener("click",e=>{if(!e.target.closest(".me"))$("#tbox").hidden=true});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")$("#tbox").hidden=true});
+applyTheme();
+const dohQ=async(n,t)=>{const j=await getJSON(`https://cloudflare-dns.com/dns-query?name=${enc(n)}&type=${t}`,{headers:{accept:"application/dns-json"}});return (j.Answer||[]).map(a=>a.data.replace(/^"|"$/g,"").replace(/" "/g,""))};
+
+/* ---------- Onglet : E-mail ---------- */
+function emailView(){
+  $("#view").innerHTML=searchRow("adresse@exemple.fr")+`<div class="card"><h3>Analyser des en-têtes d’e-mail</h3><textarea id="hd" rows="6" placeholder="Colle ici les en-têtes complets (Afficher l’original / Voir la source)"></textarea><button class="btn sm" id="hgo" style="margin-top:8px">Analyser</button><div id="hres" style="margin-top:10px"></div></div>`;
+  bind(emailGo);$("#hgo").onclick=()=>headers($("#hd").value);
+}
+async function emailGo(v){
+  const m=v.match(/^[^\s@]+@([^\s@]+\.[^\s@]+)$/),res=$("#res");
+  if(!m){res.innerHTML='<p class="err">Adresse invalide.</p>';return}
+  const d=m[1].toLowerCase();log("E-mail",d);res.innerHTML='<p class="mut">Vérification DNS…</p>';
+  const [mx,txt,dm]=await Promise.all([dohQ(d,"MX"),dohQ(d,"TXT"),dohQ("_dmarc."+d,"TXT")].map(p=>p.catch(()=>[])));
+  const spf=txt.filter(t=>t.startsWith("v=spf1")),dmarc=dm.filter(t=>t.startsWith("v=DMARC1"));
+  const st=(ok,a,b)=>ok?`<span style="color:var(--ok)">${a}</span>`:`<span class="err">${b}</span>`;
+  res.innerHTML=card("Domaine "+d,dl([
+    ["Reçoit des e-mails",st(mx.length,"Oui (MX présent)","Aucun MX")],["MX",tags(mx)],
+    ["SPF",st(spf.length,esc(spf[0]),"Absent")],["DMARC",st(dmarc.length,esc(dmarc[0]),"Absent")],
+    ["Aller plus loin",`<button class="btn alt sm" onclick="openTab(0,'${esc(d)}')">Analyser le domaine</button>`]
+  ]));
+}
+function headers(h){
+  const out=$("#hres");if(!h.trim()){out.innerHTML="";return}
+  const un=h.replace(/\r?\n[ \t]+/g," ");
+  const get=n=>(un.match(new RegExp("^"+n+":\\s*(.*)$","im"))||[])[1]||"";
+  const rec=[...un.matchAll(/^Received:\s*(.*)$/gim)].map(x=>x[1]).reverse();
+  const ips=[...new Set((un.match(/\b(?:\d{1,3}\.){3}\d{1,3}\b/g)||[]).filter(x=>!/^(10\.|127\.|192\.168\.|169\.254\.)/.test(x)&&!/^172\.(1[6-9]|2\d|3[01])\./.test(x)))];
+  const auth=get("Authentication-Results"),chk=k=>{const m=auth.match(new RegExp(k+"=(\\w+)","i"));return m?m[1]:"—"};
+  log("En-têtes","analyse locale");
+  out.innerHTML=dl([["De",esc(get("From"))],["Return-Path",esc(get("Return-Path"))],["Reply-To",esc(get("Reply-To"))],["Date",esc(get("Date"))],["Objet",esc(get("Subject"))],["SPF / DKIM / DMARC",esc(chk("spf")+" / "+chk("dkim")+" / "+chk("dmarc"))]])
+   +`<h3 style="margin:14px 0 6px">Trajet (${rec.length} serveurs, du premier au dernier)</h3>`+rec.map((r,i)=>`<pre class="mut">${i+1}. ${esc(r.slice(0,220))}</pre>`).join("")
+   +`<h3 style="margin:14px 0 6px">IP publiques trouvées</h3><div class="tags">${ips.map(x=>`<a href="#" data-ip="${esc(x)}">${esc(x)}</a>`).join("")||'<span class="mut">Aucune.</span>'}</div>`;
+}
+
+/* ---------- Onglet : URL ---------- */
+function urlGo(v){
+  let u;try{u=new URL(/^\w+:\/\//.test(v)?v:"https://"+v)}catch{$("#res").innerHTML='<p class="err">URL invalide.</p>';return}
+  log("URL",u.href);
+  const p=[...u.searchParams].map(([k,x])=>[k,esc(x)]);
+  const L=[["urlscan.io","https://urlscan.io/search/#"+enc(u.hostname)],["VirusTotal","https://www.virustotal.com/gui/search/"+enc(u.href)],["Wayback","https://web.archive.org/web/*/"+u.href]];
+  $("#res").innerHTML=card("Décomposition",dl([["Protocole",esc(u.protocol)],["Hôte",esc(u.hostname)],["Port",esc(u.port||"par défaut")],["Chemin",esc(u.pathname)],["Ancre",esc(u.hash)],["Identifiants",u.username?'<span class="err">présents dans l’URL</span>':""]]))
+   +(p.length?card("Paramètres",dl(p)):"")
+   +card("Vérifier ailleurs",`<div class="row">${L.map(x=>`<a class="btn alt sm" target="_blank" rel="noopener" href="${esc(x[1])}">${x[0]}</a>`).join("")}<button class="btn sm" onclick="openTab(0,'${esc(u.hostname)}')">Analyser le domaine</button></div>`);
+}
+
+/* ---------- Onglet : Fichier (analyse locale) ---------- */
+function fileView(){
+  $("#view").innerHTML=`<div class="card drop" id="drop"><p>Glisse un fichier ici ou <label class="btn alt sm" style="cursor:pointer">choisir<input type="file" id="f" hidden></label></p><p class="mut" style="margin:0">Analyse 100 % locale : le fichier ne quitte jamais ton navigateur.</p></div><div id="res"></div>`;
+  const d=$("#drop");
+  $("#f").onchange=e=>e.target.files[0]&&fileRun(e.target.files[0]);
+  d.ondragover=e=>{e.preventDefault();d.classList.add("hot")};d.ondragleave=()=>d.classList.remove("hot");
+  d.ondrop=e=>{e.preventDefault();d.classList.remove("hot");e.dataTransfer.files[0]&&fileRun(e.dataTransfer.files[0])};
+}
+async function fileRun(f){
+  log("Fichier",f.name);
+  const buf=await f.arrayBuffer();
+  const h=[...new Uint8Array(await crypto.subtle.digest("SHA-256",buf))].map(b=>b.toString(16).padStart(2,"0")).join("");
+  const rows=[["Nom",esc(f.name)],["Taille",(f.size/1024).toFixed(1)+" Ko"],["Type",esc(f.type||"inconnu")],["Modifié le",new Date(f.lastModified).toLocaleString("fr-FR")],["SHA-256",`<pre>${h}</pre>`]];
+  const txt=new TextDecoder("latin1").decode(buf.slice(0,3e6));
+  if(f.type==="application/pdf"||/\.pdf$/i.test(f.name))
+    [...txt.matchAll(/\/(Title|Author|Creator|Producer|CreationDate|ModDate|Subject)\s*\(([^)]{0,200})\)/g)].forEach(x=>rows.push([x[1],esc(x[2])]));
+  if(/^image\//.test(f.type)){
+    try{const b=await createImageBitmap(f);rows.push(["Dimensions",b.width+" × "+b.height+" px"])}catch{}
+    rows.push(["EXIF",txt.includes("Exif")?"Présent":"Aucun détecté"]);
+    const ex=exifParse(buf);
+    if(ex){
+      if(ex.make||ex.model)rows.push(["Appareil",esc([ex.make,ex.model].filter(Boolean).join(" "))]);
+      if(ex.date)rows.push(["Prise de vue",esc(ex.date)]);
+      if(ex.lat!=null){const di=(ex.date||"").replace(/^(\d+):(\d+):(\d+)/,"$1-$2-$3").replace(" ","T");
+        rows.push(["Position GPS",`<b>${ex.lat.toFixed(5)}, ${ex.lon.toFixed(5)}</b> <button class="btn sm" onclick="geoFrom(${ex.lat},${ex.lon},'${esc(di)}')">Lieu, alentours et soleil</button>`])}
+      else rows.push(["Position GPS","Aucune (retirée ou désactivée)"]);
+    }
+    rows.push(["Aperçu",`<img alt="" src="${URL.createObjectURL(f)}" style="max-width:240px;border-radius:6px">`]);
+  }
+  $("#res").innerHTML=card("Métadonnées",dl(rows));
+}
+
+/* ---------- Onglet : Outils ---------- */
+function toolsView(){
+  $("#view").innerHTML=`<textarea id="t" rows="6" placeholder="Colle un texte, une valeur, un timestamp…"></textarea><div class="row" style="margin:10px 0" id="tb"></div><div class="card"><div class="row" style="justify-content:space-between"><h3 style="margin:0">Résultat</h3><button class="btn alt sm" id="tc">Copier</button></div><pre id="to" class="mut">—</pre></div>`;
+  const u8=s=>new TextEncoder().encode(s),R={"E-mails":/[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g,"URL":/https?:\/\/[^\s"'<>]+/g,"IPv4":/\b(?:\d{1,3}\.){3}\d{1,3}\b/g};
+  const ms=s=>{const n=+s.trim();return n<1e11?n*1000:n};
+  const T={
+    "Extraire e-mails, URL, IP":s=>Object.entries(R).map(([n,r])=>{const a=[...new Set(s.match(r)||[])];return n+" ("+a.length+")\n"+a.join("\n")}).join("\n\n"),
+    "Base64 → texte":s=>new TextDecoder().decode(Uint8Array.from(atob(s.trim()),c=>c.charCodeAt(0))),
+    "Texte → Base64":s=>btoa(String.fromCharCode(...u8(s))),
+    "URL décoder":s=>decodeURIComponent(s),"URL encoder":s=>encodeURIComponent(s),
+    "Hex → texte":s=>s.replace(/\s/g,"").match(/../g).map(h=>String.fromCharCode(parseInt(h,16))).join(""),
+    "Texte → Hex":s=>[...u8(s)].map(b=>b.toString(16).padStart(2,"0")).join(""),
+    "SHA-256":async s=>[...new Uint8Array(await crypto.subtle.digest("SHA-256",u8(s)))].map(b=>b.toString(16).padStart(2,"0")).join(""),
+    "Timestamp → date":s=>{const d=new Date(ms(s));return d.toISOString()+"\n"+d.toLocaleString("fr-FR")},
+    "Date → timestamp":s=>{const t=Date.parse(s);if(isNaN(t))throw 0;return Math.floor(t/1000)+" (s)\n"+t+" (ms)"}
+  };
+  $("#tb").innerHTML=Object.keys(T).map(k=>`<button class="btn alt sm">${k}</button>`).join("");
+  $("#tb").onclick=async e=>{
+    const b=e.target.closest("button");if(!b)return;
+    try{$("#to").textContent=await T[b.textContent]($("#t").value)}catch{$("#to").textContent="Entrée invalide pour cet outil."}
+  };
+  $("#tc").onclick=()=>navigator.clipboard.writeText($("#to").textContent).then(()=>toast("Copié"),()=>{});
+}
+
+/* ---------- EXIF (JPEG) : appareil, date, GPS ---------- */
+function exifParse(buf){
+  const v=new DataView(buf);if(v.byteLength<4||v.getUint16(0)!==0xFFD8)return null;
+  let o=2;
+  while(o<v.byteLength-10){
+    const m=v.getUint16(o),l=v.getUint16(o+2);
+    if(m===0xFFE1&&v.getUint32(o+4)===0x45786966)return tiff(v,o+10);
+    if((m&0xFF00)!==0xFF00)break;o+=2+l;
+  }
+  return null;
+}
+function tiff(v,s){
+  const le=v.getUint16(s)===0x4949,g16=o=>v.getUint16(o,le),g32=o=>v.getUint32(o,le),T={1:1,2:1,3:2,4:4,5:8,7:1};
+  const ifd=o=>{const r={},n=g16(o);
+    for(let i=0;i<n;i++){
+      const e=o+2+i*12,tag=g16(e),typ=g16(e+2),cnt=g32(e+4),vo=(T[typ]||1)*cnt>4?s+g32(e+8):e+8;let val;
+      if(typ===2){val="";for(let k=0;k<cnt-1;k++)val+=String.fromCharCode(v.getUint8(vo+k))}
+      else if(typ===5){val=[];for(let k=0;k<cnt;k++)val.push(g32(vo+k*8)/g32(vo+k*8+4))}
+      else val=typ===3?g16(vo):g32(vo);
+      r[tag]=val;
+    }return r};
+  try{
+    const i0=ifd(s+g32(s+4)),out={make:i0[0x10F],model:i0[0x110]};
+    if(i0[0x8769])out.date=ifd(s+i0[0x8769])[0x9003];
+    if(i0[0x8825]){const g=ifd(s+i0[0x8825]);
+      if(g[2]&&g[4]){const f=a=>a[0]+a[1]/60+a[2]/3600;out.lat=f(g[2])*(g[1]==="S"?-1:1);out.lon=f(g[4])*(g[3]==="W"?-1:1)}}
+    return out;
+  }catch{return null}
+}
+
+/* ---------- Soleil (position + ombre) ---------- */
+function sunPos(lat,lon,date){
+  const r=Math.PI/180,d=date.getTime()/86400000+2440587.5-2451545;
+  const g=(357.529+0.98560028*d)*r,L=(280.459+0.98564736*d+1.915*Math.sin(g)+0.02*Math.sin(2*g))*r,e=(23.439-4e-7*d)*r;
+  const ra=Math.atan2(Math.cos(e)*Math.sin(L),Math.cos(L)),dec=Math.asin(Math.sin(e)*Math.sin(L));
+  const H=(((18.697374558+24.06570982441908*d)%24+24)%24*15+lon)*r-ra,p=lat*r;
+  const alt=Math.asin(Math.sin(p)*Math.sin(dec)+Math.cos(p)*Math.cos(dec)*Math.cos(H));
+  const az=Math.atan2(-Math.sin(H),Math.tan(dec)*Math.cos(p)-Math.sin(p)*Math.cos(H));
+  return {alt:alt/r,az:(az/r+360)%360};
+}
+const ombre=(h,alt)=>alt<=0.5?"nuit":(h/Math.tan(alt*Math.PI/180)).toFixed(1)+" m";
+
+/* ---------- Onglet : Géo ---------- */
+const GEO={date:null};
+function geoFrom(lat,lon,d){GEO.date=d||null;openTab(TABS.findIndex(t=>t.n==="Géo"),lat+", "+lon)}
+async function geoGo(v){
+  const res=$("#res");res.innerHTML='<p class="mut">Localisation…</p>';log("Géo",v);
+  let lat,lon,label;
+  const m=v.match(/^(-?\d+(?:\.\d+)?)\s*[,; ]\s*(-?\d+(?:\.\d+)?)$/);
+  if(m){lat=+m[1];lon=+m[2];label=lat.toFixed(5)+", "+lon.toFixed(5)}
+  else{
+    try{const j=await getJSON("https://api-adresse.data.gouv.fr/search/?limit=1&q="+enc(v));const f=j.features[0];if(!f)throw 0;[lon,lat]=f.geometry.coordinates;label=f.properties.label}
+    catch{res.innerHTML='<p class="err">Adresse introuvable. La recherche d’adresse couvre la France ; ailleurs, saisis « lat, lon ».</p>';return}
+  }
+  const L=[["OpenStreetMap",`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=18/${lat}/${lon}`],
+    ["Street View",`https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${lat},${lon}`],
+    ["Remonter le temps (IGN)",`https://remonterletemps.ign.fr/comparer?lon=${lon}&lat=${lat}&z=17&layer1=16&layer2=19&mode=split-h`],
+    ["Ventes immobilières (DVF)",`https://explore.data.gouv.fr/fr/immobilier?onglet=carte&filtre=tous&lat=${lat}&lng=${lon}&zoom=17`]];
+  res.innerHTML=card("Lieu",dl([["Position",esc(label)],["Coordonnées",`<div class="tags"><span>${lat.toFixed(6)}, ${lon.toFixed(6)}</span></div>`]])
+    +`<div class="row" style="margin-top:10px">${L.map(x=>`<a class="btn alt sm" target="_blank" rel="noopener" href="${esc(x[1])}">${x[0]}</a>`).join("")}</div>`)
+    +sunCard(lat,lon)+'<div id="g2"></div>';
+  sunBind(lat,lon);
+  const g2=$("#g2");
+  const [ov,os]=await Promise.allSettled([
+    getJSON("https://overpass-api.de/api/interpreter?data="+enc(`[out:json][timeout:20];(node(around:300,${lat},${lon})[amenity];node(around:300,${lat},${lon})[shop];node(around:300,${lat},${lon})[surveillance];);out tags;`)),
+    getJSON(`https://opensky-network.org/api/states/all?lamin=${lat-.4}&lamax=${lat+.4}&lomin=${lon-.6}&lomax=${lon+.6}`)
+  ]);
+  if(ov.status==="fulfilled"){
+    const c={};let cam=0;
+    ov.value.elements.forEach(e=>{const t=e.tags||{};if(t.surveillance)cam++;const k=t.amenity||t.shop;if(k)c[k]=(c[k]||0)+1});
+    g2.innerHTML+=card("Dans un rayon de 300 m (OpenStreetMap)",tags(Object.entries(c).sort((a,b)=>b[1]-a[1]).map(([k,n])=>k+" × "+n))
+      +`<p class="mut" style="margin:10px 0 0">Caméras de surveillance cartographiées : ${cam}. Les données sont saisies par la communauté, donc loin d’être exhaustives.</p>`);
+  }else g2.innerHTML+=card("Alentours (OpenStreetMap)",'<span class="mut">Service indisponible, réessaie.</span>');
+  if(os.status==="fulfilled"){
+    const a=(os.value.states||[]).map(s=>`${(s[1]||"inconnu").trim()} · ${s[2]} · ${s[8]?"au sol":Math.round(s[7]||0)+" m"} · ${Math.round((s[9]||0)*3.6)} km/h`);
+    g2.innerHTML+=card(`Avions en vol dans ~40 km (${a.length}, OpenSky, en direct)`,tags(a));
+  }else g2.innerHTML+=card("Avions (OpenSky)",'<span class="mut">Indisponible (limite de requêtes anonymes) : réessaie dans une minute.</span>');
+}
+function sunCard(lat,lon){
+  const t=GEO.date||new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString();GEO.date=null;
+  return `<div class="card"><h3>Soleil à cet endroit</h3><div class="row"><input type="datetime-local" id="sd" value="${esc(t.slice(0,16))}"><label class="mut">Objet de <input type="number" id="sh" value="1" min="0.1" step="0.1" style="width:80px"> m</label></div><div id="so" style="margin-top:12px"></div><p class="mut" style="margin:10px 0 0">Mesure l’ombre d’un objet de hauteur connue sur une photo, puis cherche la ligne du tableau qui correspond : tu obtiens l’heure ou la date possible. L’heure saisie est celle de ton navigateur.</p></div>`;
+}
+function sunBind(lat,lon){
+  const upd=()=>{
+    const b=new Date($("#sd").value);if(isNaN(b))return;const h=+$("#sh").value||1,p=sunPos(lat,lon,b);
+    const rows=[["Maintenant",`hauteur ${p.alt.toFixed(1)}° · soleil au cap ${p.az.toFixed(0)}° · ombre ${ombre(h,p.alt)} vers le cap ${((p.az+180)%360).toFixed(0)}°`]];
+    for(let k=6;k<=21;k++){const d=new Date(b);d.setHours(k,0,0,0);const q=sunPos(lat,lon,d);rows.push([k+" h",q.alt>0?`${q.alt.toFixed(0)}° · cap ${q.az.toFixed(0)}° · ombre ${ombre(h,q.alt)}`:"<span class=mut>nuit</span>"])}
+    $("#so").innerHTML=dl(rows);
+  };
+  $("#sd").oninput=upd;$("#sh").oninput=upd;upd();
+}
+
+/* ---------- Indicateurs, dossier, enquête ---------- */
+const IDX=n=>TABS.findIndex(t=>t.n===n);
+const TL={domaine:"Domaine",ip:"IP",email:"E-mail",url:"URL",handle:"Pseudo",md5:"MD5",sha1:"SHA-1",sha256:"SHA-256",btc:"Bitcoin",eth:"Ethereum",cve:"CVE",invite:"Invitation Discord",id:"ID long",note:"Note"};
+const openFor=t=>({domaine:canTab("Enquête")?"Enquête":"Domaine",ip:"IP",email:"E-mail",url:"URL",handle:"Pseudo"})[t];
+const ent=(t,v)=>`<span class="en" data-t="${t}" data-v="${esc(v)}"><span class="ev" title="Copier">${esc(v)}</span><button data-a="go" title="Ouvrir dans l’outil adapté">↗</button><button data-a="add" title="Ajouter au dossier">+</button></span>`;
+const CK=()=>"mz_case_"+(ME?ME.id:"x");
+function caseGet(){try{return JSON.parse(localStorage.getItem(CK())||"[]")}catch{return[]}}
+function caseSet(a){try{localStorage.setItem(CK(),JSON.stringify(a))}catch{}}
+function addCase(t,v,src,note){const a=caseGet();if(a.some(x=>x.t===t&&x.v===v))return false;a.unshift({t,v,src:src||"",note:note||"",ts:new Date().toISOString()});caseSet(a);return true}
+function addMany(l,src){let n=0;l.forEach(([t,v])=>{if(addCase(t,v,src))n++});toast(n+" ajouté(s) au dossier")}
+function dl_(name,type,data){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([data],{type}));a.download=name;a.click()}
+document.addEventListener("click",e=>{
+  const ev=e.target.closest(".en .ev");
+  if(ev){navigator.clipboard.writeText(ev.textContent).then(()=>toast("Copié"),()=>{});return}
+  const b=e.target.closest(".en button");if(!b)return;
+  const en=b.closest(".en"),t=en.dataset.t,v=en.dataset.v;
+  if(b.dataset.a==="add")return toast(addCase(t,v,"manuel")?"Ajouté au dossier":"Déjà dans le dossier");
+  const tab=openFor(t);
+  if(tab&&canTab(tab))openTab(IDX(tab),v.replace(/^@/,""));else navigator.clipboard.writeText(v).then(()=>toast("Copié"),()=>{});
+});
+
+/* ---------- Extracteur ---------- */
+function extract(txt){
+  const s=txt.replace(/hxxp/gi,"http").replace(/\[(?:\.|dot)\]|\((?:\.|dot)\)/gi,".").replace(/\[(?:@|at)\]|\((?:@|at)\)/gi,"@").replace(/\[:\/\/\]/g,"://");
+  const O={},add=(t,v)=>{const m=O[t]||(O[t]=new Map());m.set(v,(m.get(v)||0)+1)};
+  const F=(re,t,fn)=>{for(const m of s.matchAll(re)){const v=fn?fn(m[0]):m[0];if(v)add(t,v)}};
+  const BAD=new Set("png jpg jpeg gif svg css js json html htm txt pdf doc docx xls xlsx zip exe dll php py md csv log ini cfg lua xml yml yaml bat sh ico woff woff2 ttf mp3 mp4 webp ts tsx jsx rar iso bin tmp lock map java class cpp rb go rs".split(" "));
+  const dom=h=>{h=String(h).toLowerCase().replace(/\.$/,"");const t=h.split(".").pop();return BAD.has(t)||/^\d+$/.test(t)||h.length>253?"":h};
+  F(/https?:\/\/[^\s<>"'`)\]}]+/gi,"url",u=>u.replace(/[.,;:!?]+$/,""));
+  F(/[a-z0-9._%+-]+@[a-z0-9-]+(?:\.[a-z0-9-]+)*\.[a-z]{2,24}/gi,"email",x=>x.toLowerCase());
+  F(/(?<![\d.])(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)(?!\d)/g,"ip",x=>/^(0\.|10\.|127\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.)/.test(x)?"":x);
+  F(/(?<![\w:])(?:[0-9a-f]{0,4}:){2,7}[0-9a-f]{0,4}(?![\w:])/gi,"ip",x=>{if(!(x.includes("::")||x.split(":").length===8))return"";try{new URL("http://["+x+"]");return x.toLowerCase()}catch{return""}});
+  (O.url||new Map()).forEach((n,u)=>{try{const h=new URL(u).hostname;if(!/^[\d.]+$/.test(h)&&!h.includes(":"))add("domaine",dom(h))}catch{}});
+  (O.email||new Map()).forEach((n,m)=>{const d=dom(m.split("@")[1]);if(d)add("domaine",d)});
+  F(/(?<![\w@.-])(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,24}(?![\w-])/gi,"domaine",dom);
+  F(/(?<![a-f0-9])[a-f0-9]{32}(?![a-f0-9])/gi,"md5",x=>x.toLowerCase());
+  F(/(?<![a-f0-9])[a-f0-9]{40}(?![a-f0-9])/gi,"sha1",x=>x.toLowerCase());
+  F(/(?<![a-f0-9])[a-f0-9]{64}(?![a-f0-9])/gi,"sha256",x=>x.toLowerCase());
+  F(/\b(?:bc1[a-z0-9]{25,60}|[13][a-km-zA-HJ-NP-Z1-9]{25,34})\b/g,"btc");
+  F(/\b0x[a-fA-F0-9]{40}\b/g,"eth");
+  F(/\bCVE-\d{4}-\d{4,7}\b/gi,"cve",x=>x.toUpperCase());
+  F(/discord(?:app)?\.com\/invite\/[a-z0-9-]{2,32}|discord\.gg\/[a-z0-9-]{2,32}/gi,"invite",x=>x.split("/").pop());
+  F(/(?<![\w.])@[a-z0-9_.]{3,32}\b/gi,"handle");
+  F(/(?<!\d)\d{17,20}(?!\d)/g,"id");
+  return O;
+}
+function xRender(O){
+  window.XR=O;
+  const keys=["domaine","ip","email","url","handle","invite","id","cve","btc","eth","md5","sha1","sha256"].filter(k=>O[k]&&O[k].size);
+  if(!keys.length)return'<p class="mut">Aucun indicateur trouvé.</p>';
+  return keys.map(k=>{const m=[...O[k]].sort((a,b)=>b[1]-a[1]);
+    return `<div class="card"><h3>${TL[k]} (${m.length})</h3><div class="row" style="margin-bottom:6px"><button class="btn alt sm" data-xk="${k}" data-xa="copy">Copier tout</button><button class="btn alt sm" data-xk="${k}" data-xa="add">Tout ajouter au dossier</button></div><div class="ens">${m.slice(0,300).map(([v,n])=>ent(k,v)+(n>1?`<span class="mut">×${n}</span>`:"")).join("")}</div></div>`}).join("");
+}
+function extractView(){
+  $("#view").innerHTML=`<div class="card"><h3>Extracteur d’indicateurs</h3><p class="mut" style="margin-top:0">Colle un texte, un e-mail, des en-têtes, un log, du code source… ou dépose un fichier texte. Les liens « défangés » (hxxp, [.]) sont pris en compte. Chaque indicateur s’ouvre dans l’outil adapté ou s’ajoute au dossier.</p><textarea id="xt" rows="8" placeholder="Colle ton texte ici"></textarea><div class="row" style="margin-top:10px"><button class="btn" id="xg">Extraire</button><label class="btn alt" style="cursor:pointer">Fichier<input type="file" id="xf" hidden></label></div></div><div id="xr"></div>`;
+  const go=()=>{$("#xr").innerHTML=xRender(extract($("#xt").value))};
+  $("#xg").onclick=go;
+  $("#xf").onchange=async e=>{const f=e.target.files[0];if(f){$("#xt").value=(await f.text()).slice(0,2e6);go()}};
+  $("#xr").onclick=e=>{const b=e.target.closest("[data-xk]");if(!b||!window.XR)return;const k=b.dataset.xk,l=[...window.XR[k].keys()];
+    if(b.dataset.xa==="copy")navigator.clipboard.writeText(l.join("\n")).then(()=>toast("Copié"),()=>{});else addMany(l.map(v=>[k,v]),"extracteur")};
+}
+
+/* ---------- Dossier ---------- */
+function dossierView(){
+  const a=caseGet();
+  $("#view").innerHTML=`<div class="card"><h3>Dossier (${a.length})</h3><p class="mut" style="margin-top:0">Rassemble ici ce que tu trouves (bouton + sur chaque indicateur), ajoute tes notes, puis exporte. Les données restent dans ce navigateur.</p><div class="row"><input class="in" id="dn" placeholder="Ajouter un indicateur ou une note à la main"><button class="btn" id="da">Ajouter</button></div><div class="row" style="margin-top:12px"><input class="in" id="df" placeholder="Filtrer" style="max-width:200px"><button class="btn alt sm" id="dm">Exporter (Markdown)</button><button class="btn alt sm" id="dj">Exporter (JSON)</button><label class="btn alt sm" style="cursor:pointer">Importer<input type="file" id="di" accept=".json" hidden></label><button class="btn alt sm" id="dc">Vider</button></div></div><div class="card" id="dl">${a.map((x,i)=>`<div class="drow" data-i="${i}" data-s="${esc((x.t+" "+x.v+" "+x.note).toLowerCase())}"><span class="mut">${esc(TL[x.t]||x.t)}</span><span>${x.t==="note"?esc(x.v):ent(x.t,x.v)}</span><input class="in nt" value="${esc(x.note)}" placeholder="note"><span class="mut" title="${esc(x.ts)}">${esc(x.src)} <button class="btn alt sm" data-rm>Retirer</button></span></div>`).join("")||'<span class="mut">Dossier vide.</span>'}</div>`;
+  $("#da").onclick=()=>{const v=$("#dn").value.trim();if(!v)return;const X=extract(v);let n=0;
+    Object.keys(X).forEach(k=>X[k].forEach((c,x)=>{if(addCase(k,x,"manuel"))n++}));if(!n)addCase("note",v,"manuel");dossierView()};
+  $("#df").oninput=e=>{const q=e.target.value.toLowerCase();document.querySelectorAll("#dl .drow").forEach(r=>r.hidden=!r.dataset.s.includes(q))};
+  $("#dl").onchange=e=>{if(!e.target.classList.contains("nt"))return;const a=caseGet(),i=+e.target.closest(".drow").dataset.i;if(a[i]){a[i].note=e.target.value;caseSet(a)}};
+  $("#dl").onclick=e=>{if(e.target.closest("[data-rm]")){const a=caseGet();a.splice(+e.target.closest(".drow").dataset.i,1);caseSet(a);dossierView()}};
+  $("#dc").onclick=()=>{if(confirm("Vider tout le dossier ?")){caseSet([]);dossierView()}};
+  $("#dj").onclick=()=>dl_("mz-tool-dossier.json","application/json",JSON.stringify(caseGet(),null,2));
+  $("#dm").onclick=()=>{const g={};caseGet().forEach(x=>(g[x.t]=g[x.t]||[]).push(x));
+    dl_("mz-tool-dossier.md","text/markdown","# Dossier MZ TOOL\n\nGénéré le "+new Date().toLocaleString("fr-FR")+"\n\n"+Object.keys(g).map(k=>"## "+(TL[k]||k)+"\n\n"+g[k].map(x=>"- "+x.v+(x.note?" — "+x.note:"")+" ("+x.src+", "+dateFR(x.ts)+")").join("\n")).join("\n\n")+"\n")};
+  $("#di").onchange=async e=>{try{const j=JSON.parse(await e.target.files[0].text());if(Array.isArray(j)){j.forEach(x=>x&&x.t&&x.v&&addCase(x.t,String(x.v),x.src,x.note));dossierView()}}catch{toast("Fichier invalide")}};
+}
+
+/* ---------- Enquête (domaine, URL, e-mail, IP) ---------- */
+const tj=(u,o={},ms=20000)=>{const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);return getJSON(u,{...o,signal:c.signal}).finally(()=>clearTimeout(t))};
+const DOH=(n,t)=>tj(`https://cloudflare-dns.com/dns-query?name=${enc(n)}&type=${t}`,{headers:{accept:"application/dns-json"}},12000).catch(()=>({}));
+const ans=(j,ty)=>(j.Answer||[]).filter(a=>a.type===ty).map(a=>String(a.data).replace(/\.$/,"").replace(/^"|"$/g,"").replace(/"\s*"/g,""));
+async function pool(items,n,fn){const out=[];let i=0;await Promise.all(Array.from({length:Math.min(n,items.length)},async()=>{while(i<items.length){const k=i++;try{out[k]=await fn(items[k])}catch{out[k]=null}}}));return out}
+const VEND=[[/google|googlemail/i,"Google"],[/outlook\.com|protection\.outlook|microsoft|office365/i,"Microsoft 365"],[/mimecast/i,"Mimecast"],[/pphosted|proofpoint/i,"Proofpoint"],[/ovh/i,"OVH"],[/zoho/i,"Zoho"],[/protonmail|proton\.ch/i,"Proton"],[/ionos|kundenserver|1and1/i,"IONOS"],[/gandi/i,"Gandi"],[/cloudflare/i,"Cloudflare"],[/awsdns|amazonaws|amazonses/i,"Amazon AWS"],[/azure|msft\.net/i,"Microsoft Azure"],[/sendgrid/i,"SendGrid"],[/mailgun/i,"Mailgun"],[/mcsv|mailchimp|mandrill/i,"Mailchimp"],[/hubspot/i,"HubSpot"],[/zendesk/i,"Zendesk"],[/salesforce|exacttarget/i,"Salesforce"],[/domaincontrol|godaddy/i,"GoDaddy"],[/registrar-servers|namecheap/i,"Namecheap"],[/github\.io/i,"GitHub Pages"],[/herokuapp|herokudns/i,"Heroku"],[/netlify/i,"Netlify"],[/vercel/i,"Vercel"],[/shopify/i,"Shopify"],[/wixdns|wix\.com/i,"Wix"],[/fastly/i,"Fastly"],[/akamai/i,"Akamai"],[/o2switch/i,"o2switch"],[/infomaniak/i,"Infomaniak"],[/scaleway|online\.net/i,"Scaleway"],[/hetzner/i,"Hetzner"]];
+const VER=[[/google-site-verification/,"Google (Search Console)"],[/^MS=/,"Microsoft 365"],[/facebook-domain-verification/,"Meta"],[/atlassian-domain-verification/,"Atlassian"],[/docusign/,"DocuSign"],[/stripe-verification/,"Stripe"],[/apple-domain-verification/,"Apple"]];
+const TAKE=/github\.io|herokuapp\.com|azurewebsites\.net|cloudapp\.net|trafficmanager\.net|s3[.-][a-z0-9-]*amazonaws\.com|elasticbeanstalk\.com|netlify\.app|vercel\.app|myshopify\.com|zendesk\.com|readthedocs\.io|surge\.sh|bitbucket\.io|ghost\.io|pantheonsite\.io/i;
+const SENS=/^(dev|test|staging|stage|preprod|uat|qa|admin|vpn|jenkins|gitlab|git|jira|intranet|internal|backup|old|beta|sandbox|phpmyadmin|grafana|kibana|demo)(\d|-|$)/i;
+const DOC=/\.(pdf|docx?|xlsx?|pptx?|csv|odt)(\?|#|$)/i,RISK=/\.(sql|bak|old|zip|rar|7z|tar|gz|env|ini|log|conf|cfg|ya?ml|dump|swp)(\?|#|$)|\/(\.git|\.env|phpmyadmin|backup|dump)(\/|$)/i;
+async function enquete(raw){
+  const res=$("#res");let v=raw.trim();
+  const em=v.match(/^[^\s@]+@([^\s@]+)$/);if(em)v=em[1];
+  if(/^https?:\/\//i.test(v)){try{v=new URL(v).hostname}catch{}}
+  v=v.toLowerCase().replace(/^www\./,"").replace(/\.$/,"");
+  if(/^(\d{1,3}\.){3}\d{1,3}$/.test(v))return ip(v);
+  if(!/^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(v)){res.innerHTML='<p class="err">Saisis un domaine, une URL, une adresse e-mail ou une IP.</p>';return}
+  const d=v;log("Enquête",d);
+  res.innerHTML='<p class="mut">Étape 1/3 : DNS, certificats, archives et enregistrement…</p>';
+  const [A,MX,NS,TXT,DM,MTA,wc,crt,cdx,rd]=await Promise.all([DOH(d,"A"),DOH(d,"MX"),DOH(d,"NS"),DOH(d,"TXT"),DOH("_dmarc."+d,"TXT"),DOH("_mta-sts."+d,"TXT"),DOH("mz-"+Math.random().toString(36).slice(2,9)+"."+d,"A"),
+    tj(`https://crt.sh/?q=%25.${enc(d)}&output=json`,{},25000).catch(()=>null),
+    tj(`https://web.archive.org/cdx/search/cdx?url=${enc(d)}&matchType=domain&output=json&fl=original,timestamp&collapse=urlkey&filter=statuscode:200&limit=4000`,{},30000).catch(()=>null),
+    tj("https://rdap.org/domain/"+enc(d)).catch(()=>null)]);
+  const subs=new Set([d]),addS=h=>{h=String(h).toLowerCase().replace(/^\*\./,"");if(/^[a-z0-9.-]+$/.test(h)&&(h===d||h.endsWith("."+d)))subs.add(h)};
+  (Array.isArray(crt)?crt:[]).forEach(c=>String(c.name_value).split("\n").forEach(addS));
+  const urls=(Array.isArray(cdx)?cdx:[]).slice(1);urls.forEach(r=>{try{addS(new URL(r[0]).hostname)}catch{}});
+  const list=[...subs].sort((a,b)=>a.length-b.length||a.localeCompare(b));
+  res.innerHTML=`<p class="mut">Étape 2/3 : résolution de ${Math.min(list.length,80)} sous-domaines sur ${list.length}…</p>`;
+  const rs=(await pool(list.slice(0,80),8,async h=>{const j=await DOH(h,"A");return{h,ips:ans(j,1),cn:ans(j,5),dead:j.Status===3}})).filter(Boolean);
+  const byIp={},none=[];rs.forEach(r=>{if(r.ips.length)r.ips.forEach(i=>(byIp[i]=byIp[i]||[]).push(r.h));else none.push(r)});
+  const ipl=Object.keys(byIp).sort((a,b)=>byIp[b].length-byIp[a].length).slice(0,20);
+  res.innerHTML='<p class="mut">Étape 3/3 : hébergeurs et configuration e-mail…</p>';
+  const info={};
+  await pool(ipl,4,async i=>{const j=await tj("https://ipwho.is/"+i,{},10000);if(j.success!==false)info[i]=(j.connection?"AS"+j.connection.asn+" "+(j.connection.org||j.connection.isp||""):"")+" · "+(j.country||"")});
+  const dk=(await pool(["default","google","selector1","selector2","k1","k2","mail","s1","s2","dkim"],5,async s=>ans(await DOH(s+"._domainkey."+d,"TXT"),16).some(t=>/v=DKIM1|p=/i.test(t))?s:null)).filter(Boolean);
+  const txt=ans(TXT,16),mx=ans(MX,15).map(x=>x.replace(/^\d+\s+/,"")),ns=ans(NS,2);
+  const svc=new Set();[...mx,...ns,...txt,...rs.flatMap(r=>r.cn)].forEach(x=>VEND.forEach(([r,n])=>{if(r.test(x))svc.add(n)}));
+  txt.forEach(t=>VER.forEach(([r,n])=>{if(r.test(t))svc.add(n)}));
+  const W=[],w=(l,t)=>W.push([l,t]),spf=txt.find(t=>/^v=spf1/i.test(t)),dm=ans(DM,16).find(t=>/^v=DMARC1/i.test(t));
+  if(!spf)w("À vérifier","Aucun enregistrement SPF.");else if(/\+all/.test(spf))w("Important","SPF en +all : n’importe qui peut envoyer au nom du domaine.");else if(/\?all/.test(spf))w("À vérifier","SPF en ?all (neutre).");else if(/~all/.test(spf))w("Info","SPF en ~all (échec souple).");
+  if(!dm)w("À vérifier","Aucun DMARC : l’usurpation d’e-mail est plus facile.");else if(/p=none/i.test(dm))w("À vérifier","DMARC en p=none (surveillance seulement, rien n’est bloqué).");
+  if(!A.AD&&ans(A,1).length)w("Info","DNSSEC non activé ou non validé.");
+  if(ans(wc,1).length)w("Info","DNS wildcard : tout sous-domaine répond, la liste peut contenir du bruit.");
+  rs.filter(r=>r.dead&&r.cn.length).forEach(r=>w(TAKE.test(r.cn[0])?"Important":"À vérifier",`${r.h} pointe vers ${r.cn[0]} qui n’existe plus${TAKE.test(r.cn[0])?" (service tiers : risque de reprise du sous-domaine)":""}.`));
+  const sens=list.filter(h=>h!==d&&SENS.test(h.slice(0,h.length-d.length-1).split(".")[0]));
+  if(sens.length)w("À vérifier","Noms de sous-domaines sensibles visibles publiquement : "+sens.slice(0,8).join(", ")+(sens.length>8?"…":"")+".");
+  const ev=n=>{const e=(rd&&rd.events||[]).find(x=>x.eventAction===n);return e?new Date(e.eventDate):null},ex=ev("expiration"),cr=ev("registration");
+  if(ex&&ex-Date.now()<60*864e5)w("À vérifier","Le domaine expire le "+dateFR(ex)+".");
+  if(cr&&Date.now()-cr<90*864e5)w("Info","Domaine enregistré récemment ("+dateFR(cr)+").");
+  const so={Important:0,"À vérifier":1,Info:2};W.sort((a,b)=>so[a[0]]-so[b[0]]);
+  const chips=h=>h.map(x=>ent("domaine",x)).join(""),aw=r=>`<div style="word-break:break-all;margin:4px 0"><a href="https://web.archive.org/web/${esc(r[1])}/${esc(r[0])}" target="_blank" rel="noopener">${esc(r[0].replace(/^https?:\/\//,""))}</a></div>`;
+  const docs=urls.filter(r=>DOC.test(r[0])),risk=urls.filter(r=>RISK.test(r[0]));
+  const infra=ipl.map(i=>`<div class="grp">${ent("ip",i)} <span class="mut">${esc(info[i]||"")}</span><div class="ens">${chips(byIp[i].slice(0,40))}</div></div>`).join("")+(none.length?`<div class="grp"><span class="mut">Sans adresse (${none.length})</span><div class="ens">${chips(none.map(r=>r.h).slice(0,40))}</div></div>`:"");
+  res.innerHTML=`<div class="row" style="margin:0 0 10px"><button class="btn alt sm" id="eadd">Ajouter les découvertes au dossier</button></div>`
+   +card("Résumé",dl([["Sous-domaines",String(list.length)],["Adresses IP",String(ipl.length)],["Services tiers",String(svc.size)],["Points d’attention",String(W.length)]]))
+   +card("Points d’attention",W.length?dl(W.map(x=>[x[0],esc(x[1])])):'<span class="mut">Rien de notable.</span>')
+   +card("Infrastructure",infra||'<span class="mut">Aucune résolution.</span>')
+   +card("Services et prestataires",tags([...svc]))
+   +card("E-mail",dl([["MX",tags(mx)],["SPF",spf?`<pre>${esc(spf)}</pre>`:""],["DMARC",dm?`<pre>${esc(dm)}</pre>`:""],["DKIM",dk.length?tags(dk):""],["MTA-STS",ans(MTA,16).length?"Présent":""]]))
+   +card("Enregistrement",dl([["Créé le",cr?dateFR(cr):""],["Expire le",ex?dateFR(ex):""]]))
+   +(docs.length?card(`Documents archivés (${docs.length})`,docs.slice(0,25).map(aw).join("")):"")
+   +(risk.length?card(`Fichiers et chemins à risque archivés (${risk.length})`,risk.slice(0,25).map(aw).join("")):"");
+  $("#eadd").onclick=()=>addMany([["domaine",d],...ipl.map(i=>["ip",i]),...list.filter(h=>h!==d).slice(0,150).map(h=>["domaine",h])],"Enquête "+d);
+}
+
+/* ---------- Routeur d’onglets ---------- */
+const TABS=[
+  {n:"Enquête",ph:"domaine, URL, e-mail ou IP",fn:enquete},
+  {n:"Domaine",ph:"exemple.fr",fn:domaine},{n:"IP",ph:"8.8.8.8 ou 2606:4700::1111",fn:ip},
+  {n:"Entreprise (FR)",ph:"Nom ou SIREN",fn:entreprise},{n:"Pseudo",ph:"pseudo à vérifier",fn:pseudo},
+  {n:"E-mail",view:emailView},{n:"URL",ph:"https://exemple.fr/page?id=1",fn:urlGo},
+  {n:"Extracteur",view:extractView},{n:"Dossier",view:dossierView},
+  {n:"Fichier",view:fileView},{n:"Géo",ph:"Adresse ou lat, lon",fn:geoGo},{n:"Outils",view:toolsView},
+  {n:"Dorks",view:dorksView},{n:"Sources",view:sourcesView}
+];
+function show(i){
+  document.querySelectorAll("#tabs button").forEach((b,k)=>b.setAttribute("aria-selected",k===i));
+  const t=TABS[i];
+  if(!canTab(t.n))return lockedView(t.n);
+  if(t.view)return t.view();
+  $("#view").innerHTML=searchRow(t.ph);bind(t.fn);
+}
+$("#tabs").innerHTML=TABS.map(t=>`<button role="tab" aria-selected="false">${t.n}</button>`).join("");
+document.querySelectorAll("#tabs button").forEach((b,i)=>b.onclick=()=>show(i));
+/* ---------- Accueil ---------- */
+const DESC={"Enquête":"Cartographie complète d’un domaine : sous-domaines, hébergeurs, failles de config","Domaine":"Propriétaire, DNS, sous-domaines, archives","IP":"Pays, opérateur, bloc réseau","Entreprise (FR)":"Annuaire officiel français","Pseudo":"Profils publics à vérifier","E-mail":"SPF, DMARC, en-têtes de mail","URL":"Décomposer et vérifier un lien","Extracteur":"Sortir domaines, IP, e-mails, hash d’un texte","Dossier":"Rassembler, annoter et exporter tes trouvailles","Fichier":"Métadonnées, EXIF, empreinte","Géo":"Lieu, soleil, alentours, avions","Outils":"Base64, hash, extraction","Dorks":"Requêtes de recherche avancées","Sources":"Annuaire de sites publics"};
+function smart(v){
+  const c=v.replace(/\s/g,"");let i;
+  if(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v))i=IDX(canTab("Enquête")?"Enquête":"E-mail");
+  else if(/^https?:\/\//i.test(v)||/^[^\s\/]+\.[a-z]{2,}\/\S+/i.test(v))i=IDX("URL");
+  else if(/^(\d{1,3}\.){3}\d{1,3}$/.test(v)||/^[0-9a-f:]+:[0-9a-f:]+$/i.test(v))i=IDX("IP");
+  else if(/^-?\d+(\.\d+)?\s*[,;]\s*-?\d+(\.\d+)?$/.test(v))i=IDX("Géo");
+  else if(/^[a-z0-9-]+(\.[a-z0-9-]+)+$/i.test(v))i=IDX(canTab("Enquête")?"Enquête":"Domaine");
+  else if(/^(\d{9}|\d{14})$/.test(c)||/\s/.test(v))i=IDX("Entreprise (FR)");
+  else i=IDX("Pseudo");
+  openTab(i,v);
+}
+function home(){
+  document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-selected","false"));
+  const h=new Date().getHours(),hi=h>=18||h<5?"Bonsoir":"Bonjour";
+  const dt=new Date().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"});
+  $("#view").innerHTML=`<div class="homegrid"><div class="homemain"><section class="hero"><p class="hi">${hi}</p><h2>${esc(ME.name)}<img class="av" alt="" src="${esc(avUrl(ME,128))}"></h2></section>
+  <form id="sf" class="smart"><input id="sq" class="big" placeholder="Domaine, IP, e-mail, URL, adresse, pseudo…" autocomplete="off" spellcheck="false"><button class="btn">Chercher</button></form>
+  <div class="tiles">${TABS.map((t,i)=>`<button class="tile" style="--i:${i}" data-i="${i}"><b>${t.n}</b><span>${DESC[t.n]||""}</span>${lockTag(t.n)}</button>`).join("")}</div></div>
+  <aside class="homeside"><div class="card"><div class="clock" id="clk"></div><div class="dte">${esc(dt.charAt(0).toUpperCase()+dt.slice(1))}</div></div>
+  <div class="card"><h3>Récent</h3><ul class="hist" id="recent">${hist.length?hist.slice(0,6).map(h=>`<li class="lk" data-t="${esc(h.type)}" data-q="${esc(h.q)}"><span>${esc(h.type)} — ${esc(h.q)}</span></li>`).join(""):'<li class="mut" style="cursor:default">Aucune recherche pour l’instant.</li>'}</ul></div></aside></div>`;
+  clearInterval(home.iv);
+  const tick=()=>{const e=$("#clk");if(!e)return clearInterval(home.iv);e.textContent=new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})};
+  home.iv=setInterval(tick,1000);tick();
+  $("#sf").onsubmit=e=>{e.preventDefault();const v=$("#sq").value.trim();if(v)smart(v)};
+  document.querySelectorAll(".tile").forEach(b=>b.onclick=()=>show(+b.dataset.i));
+  $("#sq").focus();
+}
+
+Object.assign(MAP,{Enquête:IDX("Enquête"),Domaine:IDX("Domaine"),IP:IDX("IP"),Entreprise:IDX("Entreprise (FR)"),Pseudo:IDX("Pseudo"),URL:IDX("URL"),Géo:IDX("Géo")});
+/* ---------- Accès par pass (rôles du serveur Discord) ---------- */
+const TIERS=[
+  {k:"gratuit",n:"Gratuit",lim:5},
+  {k:"stagiaire",n:"Pass Stagiaire",lim:30},
+  {k:"pro",n:"Pass Pro",lim:150},
+  {k:"illimite",n:"Pass Illimité",lim:Infinity},
+  {k:"fondation",n:"Fondation",lim:Infinity}
+];
+/* niveau minimum par onglet : 0 gratuit, 1 stagiaire, 2 pro */
+const TAB_MIN={"Enquête":2,"Extracteur":1,"Dossier":1,"Domaine":0,"IP":0,"Pseudo":0,"Sources":0,"Entreprise (FR)":1,"E-mail":1,"URL":1,"Dorks":1,"Outils":1,"Fichier":2,"Géo":2};
+let TIER=0;
+const canTab=n=>TIER>=(TAB_MIN[n]??0);
+const lockTag=(n,short)=>canTab(n)?"":`<em class="pl">${esc(short?(TAB_MIN[n]===1?"Stag.":"Pro"):TIERS[TAB_MIN[n]].n.replace("Pass ",""))}</em>`;
+function lockedView(n){
+  $("#view").innerHTML=`<div class="card"><h3>${esc(n)}</h3><p class="mut">Cet outil est réservé au ${esc(TIERS[TAB_MIN[n]].n)} et aux accès supérieurs. Ton accès actuel : ${esc(TIERS[TIER].n)}.</p></div>`;
+}
+const dayKey=()=>new Date().toLocaleDateString("sv-SE");
+const ukey=()=>"mz_usage_"+ME.id;
+function usedToday(){try{const u=JSON.parse(localStorage.getItem(ukey())||"{}");return u.d===dayKey()?(u.n|0):0}catch{return 0}}
+function addUse(){try{localStorage.setItem(ukey(),JSON.stringify({d:dayKey(),n:usedToday()+1}))}catch{}}
+function paintBar(){
+  const T=TIERS[TIER],r=T.lim===Infinity?"Recherches illimitées":`Recherches aujourd’hui : <b>${usedToday()}</b> / ${T.lim}`;
+  $("#bar").innerHTML=`<span class="lvl">Accès <b>${esc(T.n)}</b></span><span>${r}</span>`;
+}
+function paintNav(){
+  $("#tabs").innerHTML=TABS.map(t=>`<button role="tab" aria-selected="false"${canTab(t.n)?"":` class="lk2" title="Réservé au ${esc(TIERS[TAB_MIN[t.n]].n)}"`}>${t.n}${lockTag(t.n,true)}</button>`).join("");
+  document.querySelectorAll("#tabs button").forEach((b,i)=>b.onclick=()=>show(i));
+}
+function deny(){
+  document.querySelectorAll(".denied").forEach(e=>e.remove());
+  const h=`<div class="card denied"><h3>Limite du jour atteinte</h3><p class="mut">Tu as utilisé tes ${TIERS[TIER].lim} recherches du jour avec l’accès ${esc(TIERS[TIER].n)}. Elles se remettent à zéro à minuit. Pour en faire plus, passe au pass supérieur sur le serveur Discord.</p></div>`;
+  const r=$("#res");if(r)r.innerHTML=h;else $("#view").insertAdjacentHTML("beforeend",h);
+}
+const guarded=f=>function(...a){
+  if(usedToday()>=TIERS[TIER].lim){deny();return}
+  addUse();paintBar();return f.apply(this,a);
+};
+TABS.forEach(t=>{if(t.fn)t.fn=guarded(t.fn)});
+emailGo=guarded(emailGo);fileRun=guarded(fileRun);
+
+/* ---------- Connexion Discord (flux implicite, 100 % navigateur) ---------- */
+const CFG=Object.assign({clientId:"",guildId:"",ownerId:"",roles:{},invite:"",allowedIds:[]},window.MZ_CONFIG||{});
+const REDIRECT=location.origin+location.pathname.replace(/index\.html$/,"");
+let ME=null;
+const avUrl=(u,s)=>u.avatar?`https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.${u.avatar.startsWith("a_")?"gif":"png"}?size=${s}`:`https://cdn.discordapp.com/embed/avatars/${Number(BigInt(u.id)>>22n)%6}.png`;
+const sget=()=>{try{return JSON.parse(localStorage.getItem("mz_session")||"null")}catch{return null}};
+const sset=v=>{try{v?localStorage.setItem("mz_session",JSON.stringify(v)):localStorage.removeItem("mz_session")}catch{}};
+function gate(html){$("#app").hidden=true;$("#gate").hidden=false;$("#gate-body").innerHTML=html}
+const joinLink=()=>CFG.invite?`<a href="${esc(CFG.invite)}" target="_blank" rel="noopener">rejoindre le serveur Discord</a>`:"rejoindre le serveur Discord";
+function loginBtn(msg){
+  const st=[...crypto.getRandomValues(new Uint32Array(4))].join("-");
+  try{sessionStorage.setItem("mz_state",st)}catch{}
+  const url="https://discord.com/oauth2/authorize?"+new URLSearchParams({client_id:CFG.clientId,response_type:"token",redirect_uri:REDIRECT,scope:"identify guilds.members.read",state:st});
+  return (msg?`<p class="err">${esc(msg)}</p>`:"")+`<p class="join">Pour accéder à MZ TOOL, pense à ${joinLink()} avant de te connecter.</p><a class="btn discord" href="${esc(url)}">Continuer avec Discord</a>`;
+}
+const setupHelp=()=>`<ol><li>Crée une application sur <b>discord.com/developers/applications</b>.</li><li>Dans <b>OAuth2 › Redirects</b>, ajoute exactement :<div class="tags" style="margin-top:6px"><span>${esc(REDIRECT)}</span></div></li><li>Copie le <b>Client ID</b> dans <b>config.js</b>, puis recharge la page.</li></ol>`;
+function paintMe(){
+  $("#who").innerHTML=`<img class="av sm" alt="" src="${esc(avUrl(ME,64))}"><span>${esc(ME.name)}</span>`;
+  $("#brand").onclick=home;
+  $("#lo").onclick=()=>{sset(null);location.reload()};
+}
+/* Vérifie l'appartenance au serveur et lit les rôles du membre (aucun bot nécessaire) */
+async function verify(s){
+  if(CFG.ownerId&&s.user.id===CFG.ownerId)return{tier:4};
+  if(!CFG.guildId)return{err:"cfg"};
+  let r;
+  try{r=await fetch(`https://discord.com/api/users/@me/guilds/${CFG.guildId}/member`,{headers:{Authorization:"Bearer "+s.token}})}catch{return{err:"net"}}
+  if(r.status===401||r.status===403)return{err:"auth"};
+  if(r.status===404)return{nomember:true};
+  if(!r.ok)return{err:"net"};
+  const m=await r.json(),ro=m.roles||[];
+  const t=ro.includes(CFG.roles.illimite)?3:ro.includes(CFG.roles.pro)?2:ro.includes(CFG.roles.stagiaire)?1:0;
+  return{tier:t};
+}
+function notMemberGate(){
+  gate(`<p class="err">Tu n’es pas sur le serveur Discord de MZ TOOL.</p><p>Rejoins-le, puis reviens ici : l’accès se débloque dès que tu en es membre.</p>${CFG.invite?`<a class="btn discord" href="${esc(CFG.invite)}" target="_blank" rel="noopener">Rejoindre le serveur</a>`:""}<div class="row2"><button class="btn alt" id="retry">J’ai rejoint, réessayer</button><button class="btn alt" id="out">Changer de compte</button></div>`);
+}
+let watching=false;
+async function boot(){
+  $("#gate").onclick=e=>{
+    if(e.target.id==="out"){sset(null);location.reload()}
+    if(e.target.id==="retry"){$("#gate-body").innerHTML='<p class="mut">Vérification…</p>';boot()}
+  };
+  if(location.protocol==="file:")return gate('<p>La connexion Discord a besoin d’une adresse locale. Lance <b>lancer.bat</b>, puis ouvre <b>http://localhost:8000</b>.</p>');
+  if(!CFG.clientId)return gate(setupHelp());
+  const h=new URLSearchParams(location.hash.slice(1)),q=new URLSearchParams(location.search);
+  if(h.get("access_token")){
+    let st="";try{st=sessionStorage.getItem("mz_state")||""}catch{}
+    const ok=st&&h.get("state")===st,tok=h.get("access_token"),ex=+h.get("expires_in")||86400;
+    history.replaceState(null,"",location.pathname);
+    if(!ok)return gate(loginBtn("Connexion invalide, réessaie."));
+    try{
+      const u=await getJSON("https://discord.com/api/users/@me",{headers:{Authorization:"Bearer "+tok}});
+      sset({user:{id:u.id,name:u.global_name||u.username,avatar:u.avatar},token:tok,exp:Date.now()+Math.min(ex,604800)*1000});
+    }catch{return gate(loginBtn("Discord n’a pas répondu, réessaie."))}
+  }else if(h.get("error")||q.get("error")){history.replaceState(null,"",location.pathname);return gate(loginBtn("Connexion annulée."))}
+  const s=sget();
+  if(!s||s.exp<Date.now()||!s.token)return gate(loginBtn());
+  if(CFG.allowedIds.length&&!CFG.allowedIds.includes(s.user.id))return gate('<p>Ce compte n’a pas accès à MZ TOOL.</p><button class="btn alt" id="out">Changer de compte</button>');
+  const v=await verify(s);
+  if(v.err==="auth"){sset(null);return gate(loginBtn("Session expirée, reconnecte-toi."))}
+  if(v.err==="cfg")return gate('<p class="err">Configuration incomplète : <b>guildId</b> manquant dans config.js.</p><p class="mut">Remplace aussi config.js par celui du dernier zip, puis recharge avec Ctrl+F5.</p>');
+  if(v.err)return gate('<p class="err">Impossible de vérifier ton accès pour le moment.</p><div class="row2"><button class="btn alt" id="retry">Réessayer</button></div>');
+  if(v.nomember)return notMemberGate();
+  TIER=v.tier;ME=s.user;
+  $("#gate").hidden=true;$("#app").hidden=false;
+  paintMe();paintNav();paintBar();
+  if(TIER<2){$("#exp").onclick=()=>toast("Export réservé au Pass Pro");$("#exp").title="Réservé au Pass Pro et aux accès supérieurs"}
+  home();drawHist();
+  if(!watching){watching=true;setInterval(async()=>{ /* les changements de pass sont pris en compte sans reconnexion */
+    const c=sget();if(!c)return;const r=await verify(c);
+    if(r.err==="net")return;
+    if(r.err||r.nomember)return location.reload();
+    if(r.tier!==TIER)location.reload();
+  },300000)}
+}
+boot();
+
+</script>
+<div id="toast" role="status"></div>
+</body>
+</html>
